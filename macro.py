@@ -129,7 +129,7 @@ def get_key_from_string(key_str):
 
 if __name__ == "__main__":
     print("按 Enter 开始录制，输入 exit 退出")
-    print("输入文件名开始回放，例如 text.pkl")
+    print("输入文件名开始回放，例如 test.pkl")
     print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
     print("参数依次表示重复次数，时间间隔，倍速")
     while True:
