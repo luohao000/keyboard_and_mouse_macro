@@ -2,6 +2,7 @@ import ctypes
 PROCESS_PER_MONITOR_DPI_AWARE = 2
 ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
 
+import sys
 import pickle
 import time
 from pynput import keyboard, mouse
@@ -132,8 +133,13 @@ if __name__ == "__main__":
     print("输入文件名开始回放，例如 test.pkl")
     print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
     print("参数依次表示重复次数，时间间隔，倍速")
+    _exit = False
     while True:
-        command = input("请输入命令: ")
+        if len(sys.argv) > 1:
+            command = " ".join(sys.argv[1:])
+            _exit = True
+        else:
+            command = input("请输入命令: ")
         if command == "":
             start_listeners()
         elif command.lower() == "exit":
@@ -161,3 +167,5 @@ if __name__ == "__main__":
                     replay_events(a[0], x)
                     if i < n:
                         time.sleep(t)
+            if _exit == True:
+                break
