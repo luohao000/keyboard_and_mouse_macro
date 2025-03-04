@@ -20,4 +20,4 @@
 
 ### 可以在命令行中直接输入命令
 
-如 py macro.py test.pkl 3 0.5 2.5
+如 `py macro.py test.pkl 3 0.5 2.5`
