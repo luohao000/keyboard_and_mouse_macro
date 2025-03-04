@@ -1,2 +1,6 @@
 # keyboard_and_mouse_macro
-按键精灵，键鼠记忆，鼠标宏，键盘宏
+需要安装 pynput 库
+
+`pip install pynput`
+
+数据保存在 `.pkl` 文件中
