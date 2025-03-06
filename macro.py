@@ -160,14 +160,8 @@ def main():
                 replay_events(command, 1)
             elif c > 1:
                 n = int(a[1])
-                if c > 2:
-                    t = float(a[2])  # 时间间隔
-                else:
-                    t = 0
-                if c > 3:
-                    x = float(a[3])  # 倍速
-                else:
-                    x = 1
+                t = float(a[2]) if c > 2 else 0 # 时间间隔
+                x = float(a[3]) if c > 3 else 1 # 倍速
                 for i in range(1, n + 1):
                     print("开始第 " + str(i) + " 次回放")
                     replay_events(a[0], x)
