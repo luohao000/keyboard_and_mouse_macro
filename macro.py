@@ -3,6 +3,7 @@ PROCESS_PER_MONITOR_DPI_AWARE = 2
 ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
 
 import sys
+import msvcrt
 import pickle
 import time
 from pynput import keyboard, mouse
@@ -128,13 +129,19 @@ def get_key_from_string(key_str):
         return getattr(keyboard.Key, key_str[4:])
     return key_str
 
-if __name__ == "__main__":
+def clear_input_buffer():
+    """清空标准输入缓冲区（Windows 专用）"""
+    while msvcrt.kbhit():  # 检查是否有未处理的按键
+        msvcrt.getch()     # 读取并丢弃这些按键
+
+def main():
     print("按 Enter 开始录制，输入 exit 退出")
     print("输入文件名开始回放，例如 test.pkl")
     print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
     print("参数依次表示重复次数，时间间隔，倍速")
     _exit = False
     while True:
+        clear_input_buffer()
         if len(sys.argv) > 1:
             command = " ".join(sys.argv[1:])
             _exit = True
@@ -161,7 +168,6 @@ if __name__ == "__main__":
                     x = float(a[3])  # 倍速
                 else:
                     x = 1
-
                 for i in range(1, n + 1):
                     print("开始第 " + str(i) + " 次回放")
                     replay_events(a[0], x)
@@ -169,3 +175,6 @@ if __name__ == "__main__":
                         time.sleep(t)
             if _exit == True:
                 break
+
+if __name__ == "__main__":
+    main()
