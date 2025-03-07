@@ -10,7 +10,6 @@ from pynput import keyboard, mouse
 
 # 存储键鼠数据
 recorded_events = []
-recording = True  # 标记是否继续记录
 
 # 监听键盘事件
 def on_key_press(key):
@@ -23,7 +22,6 @@ def on_key_press(key):
     })
 
 def on_key_release(key):
-    global recording
     key_str = get_key_string(key)
     recorded_events.append({
         "type": "key",
@@ -32,7 +30,10 @@ def on_key_release(key):
         "time": time.time()
     })
     if key == keyboard.Key.esc:  # 按 ESC 停止监听
-        recording = False
+        return False
+
+def on_release(key):
+    if key == keyboard.Key.esc:
         return False
 
 # 处理普通按键 & 特殊按键
@@ -79,7 +80,6 @@ def start_listeners():
     global recorded_events
     recorded_events = []  # 清空旧数据
     print("开始录制...（请按 ESC 停止录制）")
-    global recording
     with keyboard.Listener(on_press=on_key_press, on_release=on_key_release) as k_listener, mouse.Listener(on_click=on_click, on_move=on_move, on_scroll=on_scroll) as m_listener:
         k_listener.join()  # 等待 ESC 退出
         m_listener.stop()  # 停止鼠标监听
@@ -101,8 +101,13 @@ def replay_events(str, x):
         return
     mouse_controller = mouse.Controller()
     keyboard_controller = keyboard.Controller()
+    listener = keyboard.Listener(on_release = on_release)
+    listener.start()
     start_time = events[0]["time"]
     for event in events:
+        if not listener.is_alive():
+            print("回放停止")
+            return True
         time.sleep((event["time"] - start_time) / x)  # 保持时间间隔
         start_time = event["time"]
         if event["type"] == "key":
@@ -121,7 +126,9 @@ def replay_events(str, x):
                 mouse_controller.release(mouse.Button[event["button"].split(".")[-1]])
             elif event["event"] == "scroll":
                 mouse_controller.scroll(event["dx"], event["dy"])  # 回放滚轮操作
+    listener.stop()
     print("回放完成")
+
 
 # 字符串转换为 pynput 可识别的按键对象
 def get_key_from_string(key_str):
@@ -134,11 +141,20 @@ def clear_input_buffer():
     while msvcrt.kbhit():  # 检查是否有未处理的按键
         msvcrt.getch()     # 读取并丢弃这些按键
 
+def interruptible_sleep(seconds, listener):
+    """可中断的睡眠函数"""
+    start_time = time.time()
+    while time.time() - start_time < seconds:
+        if not listener.is_alive():  # 如果监听器停止（例如按下 ESC）
+            break
+        time.sleep(0.1)  # 每次最多睡眠 0.1 秒
+
 def main():
     print("按 Enter 开始录制，输入 exit 退出")
     print("输入文件名开始回放，例如 test.pkl")
     print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
     print("参数依次表示重复次数，时间间隔，倍速")
+    print("回放过程中可按 Esc 终止回放")
     _exit = False
     while True:
         clear_input_buffer()
@@ -164,9 +180,18 @@ def main():
                 x = float(a[3]) if c > 3 else 1 # 倍速
                 for i in range(1, n + 1):
                     print("开始第 " + str(i) + " 次回放")
-                    replay_events(a[0], x)
+                    b = replay_events(a[0], x)
+                    if b == True:
+                        break
                     if i < n:
-                        time.sleep(t)
+                        listener = keyboard.Listener(on_release = on_release)
+                        listener.start()
+                        interruptible_sleep(t, listener)
+                        if not listener.is_alive():
+                            print("回放停止")
+                            listener.stop()
+                            break
+                        listener.stop()
             if _exit == True:
                 break
 
