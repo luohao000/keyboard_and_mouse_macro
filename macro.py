@@ -150,11 +150,12 @@ def interruptible_sleep(seconds, listener):
         time.sleep(0.1)  # 每次最多睡眠 0.1 秒
 
 def main():
-    print("按 Enter 开始录制，输入 exit 退出")
-    print("输入文件名开始回放，例如 test.pkl")
-    print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
-    print("参数依次表示重复次数，时间间隔，倍速")
-    print("回放过程中可按 Esc 终止回放")
+    if len(sys.argv) == 1:
+        print("按 Enter 开始录制，输入 exit 退出")
+        print("输入文件名开始回放，例如 test.pkl")
+        print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
+        print("参数依次表示重复次数，时间间隔，倍速")
+        print("回放过程中可按 Esc 终止回放")
     _exit = False
     while True:
         clear_input_buffer()
