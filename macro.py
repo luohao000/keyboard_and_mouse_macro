@@ -84,9 +84,9 @@ def start_listeners():
         k_listener.join()  # 等待 ESC 退出
         m_listener.stop()  # 停止鼠标监听
     # **保存数据到 pickle**
-    with open("temp_data.pkl", "wb") as f:
+    with open("temp.pkl", "wb") as f:
         pickle.dump(recorded_events, f)
-    print("录制完成，文件已保存为 temp_data.pkl")
+    print("录制完成，文件已保存为 temp.pkl")
 
 # **回放键鼠事件**
 def replay_events(str, x):
@@ -152,8 +152,8 @@ def interruptible_sleep(seconds, listener):
 def main():
     if len(sys.argv) == 1:
         print("按 Enter 开始录制，输入 exit 退出")
-        print("输入文件名开始回放，例如 test.pkl")
-        print("文件名后可以加参数，例如 test.pkl 3 0.5 2.5")
+        print("输入文件名开始回放，例如 temp.pkl")
+        print("文件名后可以加参数，例如 temp.pkl 3 0.5 2.5")
         print("参数依次表示重复次数，时间间隔，倍速")
         print("回放过程中可按 Esc 终止回放")
     _exit = False
